@@ -22,11 +22,7 @@ async function run() {
   try {
     // get a Brand Data
     const userDataBase = client.db("Blog").collection("user");
-
-    app.get("/blog", async (req, res) => {
-      const result = await userDataBase.find().toArray();
-      res.send(result);
-    });
+    const userPostData = client.db("Blog").collection("post");
 
     app.post("/register", async (req, res) => {
       try {
@@ -71,6 +67,30 @@ async function run() {
       } catch (err) {
         res.status(500).json({ message: err.message });
       }
+    });
+
+    app.post("/blog", async (req, res) => {
+      try {
+        const { Title, Messages, Author, authorId } = req.body;
+
+        // Create new user
+        const userPost = {
+          Title,
+          Messages,
+          Author,
+          authorId,
+        };
+
+        const result = await userPostData.insertOne(userPost);
+        res.status(201).json({ message: "Post is successful" });
+      } catch (err) {
+        res.status(500).json({ message: err.message });
+      }
+    });
+
+    app.get("/allBlog", async (req, res) => {
+      const result = await userPostData.find().toArray();
+      res.send(result);
     });
   } finally {
     // await client.close();
