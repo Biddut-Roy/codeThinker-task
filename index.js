@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 require("dotenv").config();
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 const port = process.env.PORT || 5000;
 
 // middleware
@@ -63,7 +64,10 @@ async function run() {
         if (!validPassword)
           return res.status(400).json({ message: "Invalid credentials" });
 
-        res.status(200).json("User log in Successfully");
+        const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
+          expiresIn: "1h",
+        });
+        res.json({ token });
       } catch (err) {
         res.status(500).json({ message: err.message });
       }
